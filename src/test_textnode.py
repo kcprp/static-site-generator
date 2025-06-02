@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType, text_node_to_html_node
-from split_nodes import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -46,57 +46,6 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         self.assertEqual(html_node.tag, "b")
         self.assertEqual(html_node.value, "This is bold")
 
-class TestTextNodeSplitNodes(unittest.TestCase):
-    def test_code_node(self):
-        node = TextNode("This is text with a `code block` word", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-        
-        self.assertEqual(
-            new_nodes, 
-            [
-                TextNode("This is text with a ", TextType.TEXT),
-                TextNode("code block", TextType.CODE),
-                TextNode(" word", TextType.TEXT),
-            ]
-        )
-        
-    def test_bold_node(self):
-        node = TextNode("This is a text with a *bolded* word", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "*", TextType.BOLD)
-        
-        self.assertEqual(
-            new_nodes,
-            [
-                TextNode("This is a text with a ", TextType.TEXT),
-                TextNode("bolded", TextType.BOLD),
-                TextNode(" word", TextType.TEXT),
-            ] 
-        )
-        
-    def test_multiple_code_blocks(self):
-        node = TextNode("This is a text with `first` and `second` code block", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-        
-        self.assertEqual(
-            new_nodes,
-            [
-                TextNode("This is a text with ", TextType.TEXT),
-                TextNode("first", TextType.CODE),
-                TextNode(" and ", TextType.TEXT), 
-                TextNode("second", TextType.CODE),
-                TextNode(" code block", TextType.TEXT), 
-            ]
-        )
-        
-        
-    def test_missing_delimeter(self):
-        node = TextNode("This is a text node", TextType.TEXT)
-        with self.assertRaises(Exception) as context:
-            split_nodes_delimiter([node], "*", TextType.BOLD)
-        self.assertEqual(str(context.exception), "Invalid Markdown syntax: * not in any text node")
-        
-        
-        
 
 if __name__ == "__main__":
     unittest.main()
