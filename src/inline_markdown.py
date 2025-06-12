@@ -9,7 +9,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             continue
             
         if delimiter not in node.text:
-            raise Exception(f"Invalid Markdown syntax: {delimiter} not in any text node")
+            new_nodes.append(node)
+            continue
             
         parts = node.text.split(delimiter)
         for i, part in enumerate(parts):
@@ -41,11 +42,13 @@ def split_nodes_by_markdown(old_nodes, extract_func, pattern, text_type):
             new_nodes.append(node)
             continue
        
-        parts = [x for x in re.split(pattern, node.text) if x]
+        parts = re.split(pattern, node.text)
+
         match_index = 0
         for i, part in enumerate(parts):
             if i % 2 == 0:
-                new_nodes.append(TextNode(part, TextType.TEXT))
+                if part:
+                    new_nodes.append(TextNode(part, TextType.TEXT))
             else:
                 text, url = matches[match_index]
                 match_index += 1
@@ -68,3 +71,14 @@ def split_nodes_link(old_nodes):
         r'((?<!!)\[[^\[\]]+\]\([^()\s]+\))',
         TextType.LINK
     )
+ 
+def text_to_textnodes(text):
+    orig_node = TextNode(text, TextType.TEXT)
+    
+    nodes = split_nodes_image([orig_node])
+    nodes = split_nodes_link(nodes)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    
+    return nodes
