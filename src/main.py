@@ -1,5 +1,5 @@
 from copystatic import copy_files
-from generate_page import generate_page
+from generate_page import generate_pages_recursive
 
 def main():
     source = "static"
@@ -7,10 +7,11 @@ def main():
     
     copy_files(source, destination)
     
-    page_source = "content/index.md"
-    template = "template.html"
-    page_destination = "public/index.html"
-    generate_page(page_source, template, page_destination)
+    dir_path_content = "content"
+    template_path = "template.html"
+    dest_dir_path = "public"
+    
+    generate_pages_recursive(dir_path_content, template_path, dest_dir_path)
     
 if __name__ == "__main__":
     main()
