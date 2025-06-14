@@ -18,8 +18,22 @@ def generate_page(basepath, from_path, template_path, dest_path):
     
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
+    
+    # Ensure basepath ends with a slash
+    if not basepath.endswith('/'):
+        basepath = basepath + '/'
+    
+    # Handle absolute paths
     template = template.replace('href="/', f'href="{basepath}')
     template = template.replace('src="/', f'src="{basepath}')
+    
+    # Handle relative paths that don't start with ./
+    template = template.replace('href="', f'href="{basepath}')
+    template = template.replace('src="', f'src="{basepath}')
+    
+    # Remove double basepath if it was already added
+    template = template.replace(f'{basepath}{basepath}', basepath)
+    
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     
     dest_path = dest_path.replace('.md', '.html')
