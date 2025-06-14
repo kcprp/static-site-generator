@@ -3,7 +3,8 @@ from markdown_blocks import (
     markdown_to_blocks,
     block_to_block_type,
     BlockType,
-    markdown_to_html_node
+    markdown_to_html_node,
+    extract_title
 )
 
 class TestMarkdownToHTML(unittest.TestCase):
@@ -196,6 +197,33 @@ the **same** even with inline stuff
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
 
-     
+    def test_extract_title(self):
+        md = """
+# This is a title
+
+This is a paragraph
+"""
+        title = extract_title(md)
+        self.assertEqual(title, "This is a title")
+
+    def test_extract_title_missing(self):
+        md = """
+This is a paragraph
+
+## This is a heading but not a title
+"""
+        with self.assertRaises(Exception):
+            extract_title(md)
+
+    def test_extract_title_multiple_h1(self):
+        md = """
+# First title
+
+# Second title
+"""
+        title = extract_title(md)
+        self.assertEqual(title, "First title")
+
+
 if __name__ == "__main__":
     unittest.main()

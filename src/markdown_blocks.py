@@ -120,3 +120,13 @@ def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     html_children = [convert_block_to_html(block) for block in blocks]
     return ParentNode(tag="div", children=html_children)
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        count = block.count("#")
+        if (block.startswith("#") and count == 1):
+            return block[2:]
+    raise Exception("No title in included in markdown")
+
+print(extract_title("# Hello"))
